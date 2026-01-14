@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Box Battles - 3D Fighting Game</title>
+    <title>Box Battles</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
             font-family: Arial, sans-serif;
             overflow: hidden;
         }
-        
         #gameCanvas {
             display: block;
             width: 100vw;
             height: 100vh;
             position: absolute;
-            top: 0;
-            left: 0;
         }
-        
         .screen {
             position: absolute;
             top: 0;
@@ -37,30 +32,23 @@
             flex-direction: column;
             z-index: 10;
         }
-        
         .screen.active {
             display: flex;
         }
-        
         #startScreen {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
         .title {
             font-size: 72px;
             font-weight: bold;
             text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
             margin-bottom: 20px;
-            letter-spacing: 4px;
         }
-        
         .subtitle {
             font-size: 24px;
             margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-        
         .btn {
             padding: 20px 60px;
             font-size: 28px;
@@ -70,30 +58,36 @@
             border: none;
             border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
             margin: 10px;
         }
-        
         .btn:hover {
             transform: scale(1.1);
         }
-        
-        .controls-box {
-            margin-top: 60px;
-            text-align: center;
-            font-size: 18px;
+        #multiplayerScreen {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .peer-id-display {
             background: rgba(0,0,0,0.3);
-            padding: 20px 40px;
+            padding: 20px;
             border-radius: 10px;
-        }
-        
-        .controls-title {
+            margin: 20px 0;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 22px;
         }
-        
+        .players-list {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-width: 300px;
+        }
+        .player-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
         #hud {
             position: absolute;
             top: 20px;
@@ -102,85 +96,37 @@
             display: none;
             justify-content: space-around;
             padding: 0 40px;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: white;
-            text-shadow: 2px 2px 4px black;
             z-index: 5;
+            flex-wrap: wrap;
         }
-        
         #hud.active {
             display: flex;
         }
-        
         .health-container {
             text-align: center;
+            margin: 5px;
         }
-        
         .health-bar-bg {
             background: #333;
-            padding: 5px 10px;
+            padding: 5px;
             border-radius: 5px;
             margin-top: 5px;
         }
-        
         .health-bar {
-            height: 20px;
+            height: 12px;
             transition: width 0.3s;
         }
-        
-        #controlsInfo {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            display: none;
-            z-index: 5;
-        }
-        
-        #controlsInfo.active {
-            display: block;
-        }
-        
         #winnerScreen {
             background: rgba(0,0,0,0.9);
             color: white;
         }
-        
         .winner-text {
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 30px;
-        }
-        
-        #multiplayerScreen {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-        
-        .input-group {
-            margin: 20px 0;
-        }
-        
-        .input-group input {
-            padding: 15px 30px;
-            font-size: 20px;
-            border: none;
-            border-radius: 10px;
-            margin: 10px;
-            width: 300px;
-        }
-        
-        .peer-id-display {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-size: 18px;
         }
     </style>
 </head>
@@ -190,78 +136,57 @@
     <div id="startScreen" class="screen active">
         <h1 class="title">BOX BATTLES</h1>
         <p class="subtitle">Fight inside the arena!</p>
-        <button class="btn" onclick="gameController.showModeSelect()">PLAY LOCAL</button>
-        <button class="btn" onclick="gameController.showMultiplayerScreen()">ONLINE MULTIPLAYER</button>
-        <button class="btn" onclick="gameController.startGame('bot')">PLAY VS BOT</button>
-        <div class="controls-box">
-            <div class="controls-title">CONTROLS</div>
-            <div style="margin-bottom: 10px;">
-                <span style="color: #ff6b6b;">RED FIGHTER:</span> WASD = Move, Q = Jump, E = Attack
-            </div>
-            <div>
-                <span style="color: #6b9eff;">BLUE FIGHTER:</span> Arrows = Move, Shift = Jump, Enter = Attack
-            </div>
-        </div>
+        <button class="btn" onclick="game.showLocal()">PLAY LOCAL</button>
+        <button class="btn" onclick="game.showMultiplayer()">ONLINE PARTY</button>
+        <button class="btn" onclick="game.start('bot')">VS BOT</button>
     </div>
     
     <div id="multiplayerScreen" class="screen">
-        <h1 class="title">ONLINE MULTIPLAYER</h1>
+        <h1 class="title">ONLINE PARTY</h1>
         <div class="peer-id-display">
-            <div>Your ID: <span id="yourPeerId">Connecting...</span></div>
+            Room Code: <span id="roomCode">...</span>
         </div>
-        <div class="input-group">
-            <input type="text" id="peerIdInput" placeholder="Enter opponent's ID">
-            <button class="btn" onclick="gameController.connectToPeer()">CONNECT</button>
+        <div class="players-list">
+            <div id="playersList"></div>
         </div>
-        <button class="btn" onclick="gameController.showStartScreen()">BACK</button>
-        <div style="margin-top: 30px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; max-width: 500px;">
-            <p>Share your ID with a friend to play together!</p>
-            <p style="margin-top: 10px;">Once connected, Player 1 hosts and both can play.</p>
-        </div>
+        <input type="text" id="codeInput" placeholder="Enter Code" maxlength="8" style="padding: 15px; font-size: 20px; border-radius: 10px; margin: 10px;">
+        <button class="btn" onclick="game.join()">JOIN</button>
+        <button class="btn" id="startBtn" style="display:none;" onclick="game.startOnline()">START GAME</button>
+        <button class="btn" onclick="game.showStart()">BACK</button>
     </div>
     
-    <div id="hud">
-        <div class="health-container">
-            <div style="color: #ff0000;">RED FIGHTER</div>
-            <div class="health-bar-bg">
-                <div id="health1" class="health-bar" style="background: #ff0000; width: 200px;"></div>
-            </div>
-        </div>
-        <div class="health-container">
-            <div style="color: #0000ff;">BLUE FIGHTER</div>
-            <div class="health-bar-bg">
-                <div id="health2" class="health-bar" style="background: #0000ff; width: 200px;"></div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="controlsInfo">
-        <div style="font-weight: bold; margin-bottom: 10px;">CONTROLS</div>
-        <div><span style="color: #ff0000;">RED:</span> WASD = Move, Q = Jump, E = Attack</div>
-        <div><span style="color: #0000ff;">BLUE:</span> Arrows = Move, Shift = Jump, Enter = Attack</div>
-    </div>
+    <div id="hud"></div>
     
     <div id="winnerScreen" class="screen">
         <div class="winner-text" id="winnerText"></div>
-        <button class="btn" onclick="gameController.resetGame()">PLAY AGAIN</button>
-        <button class="btn" onclick="gameController.showStartScreen()">MAIN MENU</button>
+        <button class="btn" onclick="game.reset()">PLAY AGAIN</button>
+        <button class="btn" onclick="game.showStart()">MENU</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        var gameController = (function() {
+        var game = (function() {
             var scene, camera, renderer;
-            var player1, player2;
+            var players = [];
             var gameMode = null;
-            var peer, conn;
+            var peer, connections = [];
             var isHost = false;
-            var myPlayerNum = 1;
+            var myPlayerId = 0;
             var animationId = null;
+            var roomCode = '';
+            var playersInRoom = [];
+            
+            var playerColors = [0xff0000, 0x0000ff, 0x00ff00, 0xffff00];
+            var playerNames = ['Red', 'Blue', 'Green', 'Yellow'];
             
             var gameState = {
-                player1: { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: -4, y: 1, z: 0 } },
-                player2: { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: 4, y: 1, z: 0 } }
+                players: [
+                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: -4, y: 1, z: 0 } },
+                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: 4, y: 1, z: 0 } },
+                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: -4, y: 1, z: 4 } },
+                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: 4, y: 1, z: 4 } }
+                ]
             };
             
             var keys = {};
@@ -269,86 +194,157 @@
             var jumpPower = 0.3;
             var gravity = 0.015;
             var attackRange = 2.5;
-            var attackCooldown = { p1: 0, p2: 0 };
+            var attackCooldowns = [0, 0, 0, 0];
+            
+            function generateRoomCode() {
+                var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                var code = '';
+                for (var i = 0; i < 8; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            }
             
             function initPeer() {
-                peer = new Peer();
+                roomCode = generateRoomCode();
+                peer = new Peer(roomCode);
                 
                 peer.on('open', function(id) {
-                    document.getElementById('yourPeerId').textContent = id;
-                });
-                
-                peer.on('connection', function(connection) {
-                    conn = connection;
-                    setupConnection();
+                    document.getElementById('roomCode').textContent = roomCode;
                     isHost = true;
-                    myPlayerNum = 1;
-                });
-            }
-            
-            function connectToPeer() {
-                var peerId = document.getElementById('peerIdInput').value.trim();
-                if (!peerId) return;
-                
-                conn = peer.connect(peerId);
-                setupConnection();
-                isHost = false;
-                myPlayerNum = 2;
-            }
-            
-            function setupConnection() {
-                conn.on('open', function() {
-                    startGame('online');
+                    myPlayerId = 0;
+                    playersInRoom = [{ id: roomCode, name: 'Player 1 (You)' }];
+                    updatePlayersList();
+                    document.getElementById('startBtn').style.display = 'block';
                 });
                 
-                conn.on('data', function(data) {
-                    if (data.type && data.type === 'gameState') {
-                        if (!isHost) {
-                            gameState.player1 = data.state.player1;
-                            gameState.player2 = data.state.player2;
-                            updateVisuals();
-                        }
-                    } else if (data.type && data.type === 'input') {
-                        handleRemoteInput(data.keys);
+                peer.on('connection', function(conn) {
+                    if (playersInRoom.length < 4) {
+                        connections.push(conn);
+                        setupConnection(conn);
+                        var playerNum = playersInRoom.length + 1;
+                        playersInRoom.push({ id: conn.peer, name: 'Player ' + playerNum });
+                        updatePlayersList();
+                        broadcastPlayersList();
                     }
                 });
             }
             
+            function join() {
+                var code = document.getElementById('codeInput').value.trim().toUpperCase();
+                if (code.length !== 8) {
+                    alert('Room code must be 8 characters!');
+                    return;
+                }
+                
+                roomCode = code;
+                peer = new Peer();
+                
+                peer.on('open', function(id) {
+                    var conn = peer.connect(roomCode);
+                    connections.push(conn);
+                    setupConnection(conn);
+                    isHost = false;
+                });
+            }
+            
+            function setupConnection(conn) {
+                conn.on('open', function() {
+                    if (!isHost) {
+                        conn.send({ type: 'requestJoin' });
+                    }
+                });
+                
+                conn.on('data', function(data) {
+                    if (data.type === 'requestJoin' && isHost) {
+                        var newPlayerId = playersInRoom.length;
+                        conn.send({ 
+                            type: 'joinAccepted', 
+                            playerId: newPlayerId,
+                            players: playersInRoom
+                        });
+                    } else if (data.type === 'joinAccepted') {
+                        myPlayerId = data.playerId;
+                        playersInRoom = data.players;
+                        playersInRoom[myPlayerId].name += ' (You)';
+                        updatePlayersList();
+                    } else if (data.type === 'playersList') {
+                        playersInRoom = data.players;
+                        updatePlayersList();
+                    } else if (data.type === 'startGame') {
+                        start('online');
+                    } else if (data.type === 'gameState' && !isHost) {
+                        gameState = data.state;
+                        updateVisuals();
+                    } else if (data.type === 'input' && isHost) {
+                        processPlayerInput(data.playerId, data.keys);
+                    }
+                });
+            }
+            
+            function broadcastPlayersList() {
+                for (var i = 0; i < connections.length; i++) {
+                    if (connections[i].open) {
+                        connections[i].send({ type: 'playersList', players: playersInRoom });
+                    }
+                }
+            }
+            
+            function updatePlayersList() {
+                var html = '';
+                for (var i = 0; i < playersInRoom.length; i++) {
+                    html += '<div class="player-item">' + playersInRoom[i].name + '</div>';
+                }
+                document.getElementById('playersList').innerHTML = html;
+            }
+            
+            function startOnline() {
+                if (!isHost) return;
+                
+                for (var i = 0; i < connections.length; i++) {
+                    if (connections[i].open) {
+                        connections[i].send({ type: 'startGame' });
+                    }
+                }
+                start('online');
+            }
+            
             function sendGameState() {
-                if (conn && conn.open && isHost) {
-                    conn.send({ type: 'gameState', state: gameState });
+                if (!isHost) return;
+                for (var i = 0; i < connections.length; i++) {
+                    if (connections[i].open) {
+                        connections[i].send({ type: 'gameState', state: gameState });
+                    }
                 }
             }
             
             function sendInput() {
-                if (conn && conn.open && !isHost) {
-                    conn.send({ type: 'input', keys: keys });
-                }
+                if (isHost || connections.length === 0) return;
+                connections[0].send({ type: 'input', playerId: myPlayerId, keys: keys });
             }
             
-            function handleRemoteInput(remoteKeys) {
-                if (isHost) {
-                    processPlayerInput(2, remoteKeys);
-                }
-            }
-            
-            function showStartScreen() {
+            function showStart() {
                 document.getElementById('startScreen').classList.add('active');
                 document.getElementById('multiplayerScreen').classList.remove('active');
                 document.getElementById('winnerScreen').classList.remove('active');
                 document.getElementById('hud').classList.remove('active');
-                document.getElementById('controlsInfo').classList.remove('active');
                 if (animationId) {
                     cancelAnimationFrame(animationId);
                     animationId = null;
                 }
+                if (peer) {
+                    peer.destroy();
+                    peer = null;
+                }
+                connections = [];
+                playersInRoom = [];
             }
             
-            function showModeSelect() {
-                startGame('local');
+            function showLocal() {
+                start('local');
             }
             
-            function showMultiplayerScreen() {
+            function showMultiplayer() {
                 document.getElementById('startScreen').classList.remove('active');
                 document.getElementById('multiplayerScreen').classList.add('active');
                 if (!peer) initPeer();
@@ -360,7 +356,7 @@
                 scene.background = new THREE.Color(0x87ceeb);
                 
                 camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(0, 8, 15);
+                camera.position.set(0, 12, 18);
                 camera.lookAt(0, 0, 0);
                 
                 renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -375,11 +371,7 @@
                 directionalLight.castShadow = true;
                 scene.add(directionalLight);
                 
-                var arenaSize = 12;
-                var wallThickness = 0.5;
-                var wallHeight = 6;
-                
-                var floorGeometry = new THREE.BoxGeometry(arenaSize, 0.5, arenaSize);
+                var floorGeometry = new THREE.BoxGeometry(12, 0.5, 12);
                 var floorMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
                 var floor = new THREE.Mesh(floorGeometry, floorMaterial);
                 floor.position.y = -0.25;
@@ -393,47 +385,21 @@
                     side: THREE.DoubleSide
                 });
                 
-                var backWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(arenaSize, wallHeight, wallThickness),
-                    wallMaterial
-                );
-                backWall.position.set(0, wallHeight/2, -arenaSize/2);
+                var backWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
+                backWall.position.set(0, 3, -6);
                 scene.add(backWall);
                 
-                var frontWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(arenaSize, wallHeight, wallThickness),
-                    wallMaterial
-                );
-                frontWall.position.set(0, wallHeight/2, arenaSize/2);
+                var frontWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
+                frontWall.position.set(0, 3, 6);
                 scene.add(frontWall);
                 
-                var leftWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(wallThickness, wallHeight, arenaSize),
-                    wallMaterial
-                );
-                leftWall.position.set(-arenaSize/2, wallHeight/2, 0);
+                var leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
+                leftWall.position.set(-6, 3, 0);
                 scene.add(leftWall);
                 
-                var rightWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(wallThickness, wallHeight, arenaSize),
-                    wallMaterial
-                );
-                rightWall.position.set(arenaSize/2, wallHeight/2, 0);
+                var rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
+                rightWall.position.set(6, 3, 0);
                 scene.add(rightWall);
-                
-                var player1Geometry = new THREE.BoxGeometry(1, 2, 1);
-                var player1Material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-                player1 = new THREE.Mesh(player1Geometry, player1Material);
-                player1.position.set(-4, 1, 0);
-                player1.castShadow = true;
-                scene.add(player1);
-                
-                var player2Geometry = new THREE.BoxGeometry(1, 2, 1);
-                var player2Material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
-                player2 = new THREE.Mesh(player2Geometry, player2Material);
-                player2.position.set(4, 1, 0);
-                player2.castShadow = true;
-                scene.add(player2);
                 
                 window.addEventListener('resize', function() {
                     camera.aspect = window.innerWidth / window.innerHeight;
@@ -442,43 +408,78 @@
                 });
             }
             
-            function startGame(mode) {
+            function start(mode) {
                 gameMode = mode;
                 document.getElementById('startScreen').classList.remove('active');
                 document.getElementById('multiplayerScreen').classList.remove('active');
                 document.getElementById('hud').classList.add('active');
-                document.getElementById('controlsInfo').classList.add('active');
                 
-                gameState.player1.health = 100;
-                gameState.player2.health = 100;
-                gameState.player1.position = { x: -4, y: 1, z: 0 };
-                gameState.player2.position = { x: 4, y: 1, z: 0 };
-                gameState.player1.velocity = { x: 0, y: 0, z: 0 };
-                gameState.player2.velocity = { x: 0, y: 0, z: 0 };
-                gameState.player1.jumping = false;
-                gameState.player2.jumping = false;
-                attackCooldown.p1 = 0;
-                attackCooldown.p2 = 0;
+                var numPlayers = 2;
+                if (mode === 'online') {
+                    numPlayers = playersInRoom.length;
+                }
+                
+                for (var i = 0; i < players.length; i++) {
+                    scene.remove(players[i]);
+                }
+                players = [];
+                
+                for (var i = 0; i < numPlayers; i++) {
+                    gameState.players[i].health = 100;
+                    gameState.players[i].jumping = false;
+                    gameState.players[i].velocity = { x: 0, y: 0, z: 0 };
+                    attackCooldowns[i] = 0;
+                    
+                    var playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+                    var playerMaterial = new THREE.MeshStandardMaterial({ color: playerColors[i] });
+                    var player = new THREE.Mesh(playerGeometry, playerMaterial);
+                    player.castShadow = true;
+                    players.push(player);
+                    scene.add(player);
+                }
                 
                 if (!renderer) {
                     initThreeJS();
                 }
                 
-                updateHealthBars();
+                updateHUD(numPlayers);
+                updateVisuals();
                 animate();
             }
             
+            function updateHUD(numPlayers) {
+                var html = '';
+                for (var i = 0; i < numPlayers; i++) {
+                    var colorHex = playerColors[i].toString(16).padStart(6, '0');
+                    html += '<div class="health-container">';
+                    html += '<div style="color:#' + colorHex + '">' + playerNames[i] + '</div>';
+                    html += '<div class="health-bar-bg">';
+                    html += '<div id="h' + i + '" class="health-bar" style="background:#' + colorHex + ';width:120px"></div>';
+                    html += '</div></div>';
+                }
+                document.getElementById('hud').innerHTML = html;
+            }
+            
             function updateHealthBars() {
-                document.getElementById('health1').style.width = (gameState.player1.health * 2) + 'px';
-                document.getElementById('health2').style.width = (gameState.player2.health * 2) + 'px';
+                for (var i = 0; i < players.length; i++) {
+                    var elem = document.getElementById('h' + i);
+                    if (elem) {
+                        elem.style.width = (gameState.players[i].health * 1.2) + 'px';
+                    }
+                }
             }
             
             function updateVisuals() {
-                if (player1 && player2) {
-                    player1.position.set(gameState.player1.position.x, gameState.player1.position.y, gameState.player1.position.z);
-                    player2.position.set(gameState.player2.position.x, gameState.player2.position.y, gameState.player2.position.z);
-                    updateHealthBars();
+                for (var i = 0; i < players.length; i++) {
+                    if (players[i]) {
+                        players[i].position.set(
+                            gameState.players[i].position.x, 
+                            gameState.players[i].position.y, 
+                            gameState.players[i].position.z
+                        );
+                    }
                 }
+                updateHealthBars();
             }
             
             function createAttackEffect(position, color) {
@@ -496,8 +497,8 @@
             
             function botAI() {
                 var botKeys = {};
-                var p1Pos = gameState.player1.position;
-                var p2Pos = gameState.player2.position;
+                var p1Pos = gameState.players[0].position;
+                var p2Pos = gameState.players[1].position;
                 var distance = Math.sqrt(
                     Math.pow(p1Pos.x - p2Pos.x, 2) + 
                     Math.pow(p1Pos.z - p2Pos.z, 2)
@@ -521,7 +522,7 @@
                     botKeys['enter'] = true;
                 }
                 
-                if (Math.random() > 0.98 && !gameState.player2.jumping) {
+                if (Math.random() > 0.98 && !gameState.players[1].jumping) {
                     botKeys['shift'] = true;
                 }
                 
@@ -529,12 +530,12 @@
             }
             
             function processPlayerInput(playerNum, inputKeys) {
-                var state = (playerNum === 1) ? gameState.player1 : gameState.player2;
-                var opponent = (playerNum === 1) ? gameState.player2 : gameState.player1;
-                var controls = (playerNum === 1) ? 
+                if (playerNum >= players.length) return;
+                
+                var state = gameState.players[playerNum];
+                var controls = (playerNum === 0) ? 
                     { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' } :
                     { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter' };
-                var cooldown = (playerNum === 1) ? 'p1' : 'p2';
                 
                 if (inputKeys[controls.up]) {
                     state.velocity.z = -moveSpeed;
@@ -557,39 +558,66 @@
                     state.jumping = true;
                 }
                 
-                if (inputKeys[controls.attack] && attackCooldown[cooldown] <= 0) {
-                    var distance = Math.sqrt(
-                        Math.pow(state.position.x - opponent.position.x, 2) +
-                        Math.pow(state.position.y - opponent.position.y, 2) +
-                        Math.pow(state.position.z - opponent.position.z, 2)
-                    );
-                    
-                    if (distance < attackRange) {
-                        opponent.health -= 5;
-                        createAttackEffect(
-                            new THREE.Vector3(opponent.position.x, opponent.position.y, opponent.position.z),
-                            (playerNum === 1) ? 0xff0000 : 0x0000ff
+                if (inputKeys[controls.attack] && attackCooldowns[playerNum] <= 0) {
+                    for (var i = 0; i < players.length; i++) {
+                        if (i === playerNum) continue;
+                        
+                        var opponent = gameState.players[i];
+                        var distance = Math.sqrt(
+                            Math.pow(state.position.x - opponent.position.x, 2) +
+                            Math.pow(state.position.y - opponent.position.y, 2) +
+                            Math.pow(state.position.z - opponent.position.z, 2)
                         );
                         
-                        var dx = opponent.position.x - state.position.x;
-                        var dz = opponent.position.z - state.position.z;
-                        var len = Math.sqrt(dx * dx + dz * dz);
-                        if (len > 0) {
-                            opponent.velocity.x += (dx / len) * 0.6;
-                            opponent.velocity.y += 0.3;
-                            opponent.velocity.z += (dz / len) * 0.6;
-                        }
-                        
-                        if (opponent.health <= 0) {
-                            endGame((playerNum === 1) ? 'Red Fighter Wins!' : 'Blue Fighter Wins!');
+                        if (distance < attackRange) {
+                            opponent.health -= 5;
+                            createAttackEffect(
+                                new THREE.Vector3(opponent.position.x, opponent.position.y, opponent.position.z),
+                                playerColors[playerNum]
+                            );
+                            
+                            var dx = opponent.position.x - state.position.x;
+                            var dz = opponent.position.z - state.position.z;
+                            var len = Math.sqrt(dx * dx + dz * dz);
+                            if (len > 0) {
+                                opponent.velocity.x += (dx / len) * 0.6;
+                                opponent.velocity.y += 0.3;
+                                opponent.velocity.z += (dz / len) * 0.6;
+                            }
+                            
+                            if (opponent.health <= 0) {
+                                checkWinner();
+                            }
                         }
                     }
-                    attackCooldown[cooldown] = 30;
+                    attackCooldowns[playerNum] = 30;
+                }
+            }
+            
+            function checkWinner() {
+                var alive = [];
+                for (var i = 0; i < players.length; i++) {
+                    if (gameState.players[i].health > 0) {
+                        alive.push(i);
+                    }
+                }
+                
+                if (alive.length === 1) {
+                    endGame(playerNames[alive[0]] + ' Wins!');
+                } else if (alive.length === 0) {
+                    endGame('Draw!');
                 }
             }
             
             function animate() {
-                if (gameState.player1.health <= 0 || gameState.player2.health <= 0) {
+                var aliveCount = 0;
+                for (var i = 0; i < players.length; i++) {
+                    if (gameState.players[i].health > 0) {
+                        aliveCount++;
+                    }
+                }
+                
+                if (aliveCount <= 1) {
                     if (renderer) renderer.render(scene, camera);
                     return;
                 }
@@ -597,52 +625,41 @@
                 animationId = requestAnimationFrame(animate);
                 
                 if (gameMode === 'local') {
+                    processPlayerInput(0, keys);
                     processPlayerInput(1, keys);
-                    processPlayerInput(2, keys);
                 } else if (gameMode === 'bot') {
-                    processPlayerInput(1, keys);
+                    processPlayerInput(0, keys);
                     var botKeys = botAI();
-                    processPlayerInput(2, botKeys);
+                    processPlayerInput(1, botKeys);
                 } else if (gameMode === 'online') {
                     if (isHost) {
-                        processPlayerInput(1, keys);
+                        processPlayerInput(myPlayerId, keys);
                         sendGameState();
                     } else {
-                        processPlayerInput(2, keys);
+                        processPlayerInput(myPlayerId, keys);
                         sendInput();
                     }
                 }
                 
-                gameState.player1.velocity.y -= gravity;
-                gameState.player2.velocity.y -= gravity;
-                
-                gameState.player1.position.x += gameState.player1.velocity.x;
-                gameState.player1.position.y += gameState.player1.velocity.y;
-                gameState.player1.position.z += gameState.player1.velocity.z;
-                
-                gameState.player2.position.x += gameState.player2.velocity.x;
-                gameState.player2.position.y += gameState.player2.velocity.y;
-                gameState.player2.position.z += gameState.player2.velocity.z;
-                
-                if (gameState.player1.position.y <= 1) {
-                    gameState.player1.position.y = 1;
-                    gameState.player1.velocity.y = 0;
-                    gameState.player1.jumping = false;
+                for (var i = 0; i < players.length; i++) {
+                    gameState.players[i].velocity.y -= gravity;
+                    
+                    gameState.players[i].position.x += gameState.players[i].velocity.x;
+                    gameState.players[i].position.y += gameState.players[i].velocity.y;
+                    gameState.players[i].position.z += gameState.players[i].velocity.z;
+                    
+                    if (gameState.players[i].position.y <= 1) {
+                        gameState.players[i].position.y = 1;
+                        gameState.players[i].velocity.y = 0;
+                        gameState.players[i].jumping = false;
+                    }
+                    
+                    var maxPos = 5.5;
+                    gameState.players[i].position.x = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.x));
+                    gameState.players[i].position.z = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.z));
+                    
+                    if (attackCooldowns[i] > 0) attackCooldowns[i]--;
                 }
-                if (gameState.player2.position.y <= 1) {
-                    gameState.player2.position.y = 1;
-                    gameState.player2.velocity.y = 0;
-                    gameState.player2.jumping = false;
-                }
-                
-                var maxPos = 5.5;
-                gameState.player1.position.x = Math.max(-maxPos, Math.min(maxPos, gameState.player1.position.x));
-                gameState.player1.position.z = Math.max(-maxPos, Math.min(maxPos, gameState.player1.position.z));
-                gameState.player2.position.x = Math.max(-maxPos, Math.min(maxPos, gameState.player2.position.x));
-                gameState.player2.position.z = Math.max(-maxPos, Math.min(maxPos, gameState.player2.position.z));
-                
-                if (attackCooldown.p1 > 0) attackCooldown.p1--;
-                if (attackCooldown.p2 > 0) attackCooldown.p2--;
                 
                 updateVisuals();
                 renderer.render(scene, camera);
@@ -652,12 +669,11 @@
                 document.getElementById('winnerText').textContent = winnerText;
                 document.getElementById('winnerScreen').classList.add('active');
                 document.getElementById('hud').classList.remove('active');
-                document.getElementById('controlsInfo').classList.remove('active');
             }
             
-            function resetGame() {
+            function reset() {
                 document.getElementById('winnerScreen').classList.remove('active');
-                startGame(gameMode);
+                start(gameMode);
             }
             
             window.addEventListener('keydown', function(e) {
@@ -671,12 +687,13 @@
             initThreeJS();
             
             return {
-                showStartScreen: showStartScreen,
-                showModeSelect: showModeSelect,
-                showMultiplayerScreen: showMultiplayerScreen,
-                startGame: startGame,
-                connectToPeer: connectToPeer,
-                resetGame: resetGame
+                showStart: showStart,
+                showLocal: showLocal,
+                showMultiplayer: showMultiplayer,
+                start: start,
+                join: join,
+                startOnline: startOnline,
+                reset: reset
             };
         })();
     </script>
