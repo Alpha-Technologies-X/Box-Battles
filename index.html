@@ -138,7 +138,15 @@
         <p class="subtitle">Fight inside the arena!</p>
         <button class="btn" onclick="game.showLocal()">PLAY LOCAL</button>
         <button class="btn" onclick="game.showMultiplayer()">ONLINE PARTY</button>
-        <button class="btn" onclick="game.start('bot')">VS BOT</button>
+        <button class="btn" onclick="game.showBotSelect()">VS BOT</button>
+    </div>
+    
+    <div id="botSelectScreen" class="screen">
+        <h1 class="title">SELECT DIFFICULTY</h1>
+        <button class="btn" onclick="game.start('bot-easy')" style="background: linear-gradient(45deg, #4CAF50, #45a049);">EASY</button>
+        <button class="btn" onclick="game.start('bot-medium')" style="background: linear-gradient(45deg, #ff9800, #f57c00);">MEDIUM</button>
+        <button class="btn" onclick="game.start('bot-hard')" style="background: linear-gradient(45deg, #f44336, #d32f2f);">HARD</button>
+        <button class="btn" onclick="game.showStart()">BACK</button>
     </div>
     
     <div id="multiplayerScreen" class="screen">
@@ -263,13 +271,25 @@
                             playerId: newPlayerId,
                             players: playersInRoom
                         });
+                        broadcastPlayersList();
                     } else if (data.type === 'joinAccepted') {
                         myPlayerId = data.playerId;
                         playersInRoom = data.players;
-                        playersInRoom[myPlayerId].name += ' (You)';
+                        var myName = 'Player ' + (myPlayerId + 1) + ' (You)';
+                        playersInRoom.push({ id: conn.peer, name: myName });
                         updatePlayersList();
                     } else if (data.type === 'playersList') {
                         playersInRoom = data.players;
+                        var found = false;
+                        for (var i = 0; i < playersInRoom.length; i++) {
+                            if (playersInRoom[i].name.indexOf('(You)') !== -1) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found && myPlayerId < playersInRoom.length) {
+                            playersInRoom[myPlayerId].name += ' (You)';
+                        }
                         updatePlayersList();
                     } else if (data.type === 'startGame') {
                         start('online');
@@ -326,6 +346,7 @@
             function showStart() {
                 document.getElementById('startScreen').classList.add('active');
                 document.getElementById('multiplayerScreen').classList.remove('active');
+                document.getElementById('botSelectScreen').classList.remove('active');
                 document.getElementById('winnerScreen').classList.remove('active');
                 document.getElementById('hud').classList.remove('active');
                 if (animationId) {
@@ -338,6 +359,11 @@
                 }
                 connections = [];
                 playersInRoom = [];
+            }
+            
+            function showBotSelect() {
+                document.getElementById('startScreen').classList.remove('active');
+                document.getElementById('botSelectScreen').classList.add('active');
             }
             
             function showLocal() {
@@ -504,7 +530,25 @@
                     Math.pow(p1Pos.z - p2Pos.z, 2)
                 );
                 
-                if (distance > 3) {
+                var reactionThreshold = 0.95;
+                var jumpThreshold = 0.98;
+                var chaseDistance = 3;
+                
+                if (gameMode === 'bot-easy') {
+                    reactionThreshold = 0.90;
+                    jumpThreshold = 0.99;
+                    chaseDistance = 4;
+                } else if (gameMode === 'bot-medium') {
+                    reactionThreshold = 0.95;
+                    jumpThreshold = 0.98;
+                    chaseDistance = 3;
+                } else if (gameMode === 'bot-hard') {
+                    reactionThreshold = 0.97;
+                    jumpThreshold = 0.96;
+                    chaseDistance = 2;
+                }
+                
+                if (distance > chaseDistance) {
                     if (p1Pos.x < p2Pos.x) {
                         botKeys['arrowleft'] = true;
                     } else {
@@ -518,11 +562,11 @@
                     }
                 }
                 
-                if (distance < attackRange && Math.random() > 0.95) {
+                if (distance < attackRange && Math.random() > reactionThreshold) {
                     botKeys['enter'] = true;
                 }
                 
-                if (Math.random() > 0.98 && !gameState.players[1].jumping) {
+                if (Math.random() > jumpThreshold && !gameState.players[1].jumping) {
                     botKeys['shift'] = true;
                 }
                 
@@ -639,7 +683,7 @@
                 if (gameMode === 'local') {
                     processPlayerInput(0, keys);
                     processPlayerInput(1, keys);
-                } else if (gameMode === 'bot') {
+                } else if (gameMode === 'bot-easy' || gameMode === 'bot-medium' || gameMode === 'bot-hard') {
                     processPlayerInput(0, keys);
                     var botKeys = botAI();
                     processPlayerInput(1, botKeys);
@@ -701,6 +745,7 @@
             return {
                 showStart: showStart,
                 showLocal: showLocal,
+                showBotSelect: showBotSelect,
                 showMultiplayer: showMultiplayer,
                 start: start,
                 join: join,
