@@ -533,9 +533,21 @@
                 if (playerNum >= players.length) return;
                 
                 var state = gameState.players[playerNum];
-                var controls = (playerNum === 0) ? 
-                    { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' } :
-                    { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter' };
+                var controls;
+                
+                if (gameMode === 'online') {
+                    controls = { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' };
+                    if (inputKeys['arrowup']) inputKeys['w'] = true;
+                    if (inputKeys['arrowdown']) inputKeys['s'] = true;
+                    if (inputKeys['arrowleft']) inputKeys['a'] = true;
+                    if (inputKeys['arrowright']) inputKeys['d'] = true;
+                    if (inputKeys['shift']) inputKeys['q'] = true;
+                    if (inputKeys['enter']) inputKeys['e'] = true;
+                } else {
+                    controls = (playerNum === 0) ? 
+                        { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' } :
+                        { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter' };
+                }
                 
                 if (inputKeys[controls.up]) {
                     state.velocity.z = -moveSpeed;
