@@ -11,8 +11,9 @@
             box-sizing: border-box;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
+            background: #0a0e27;
         }
         #gameCanvas {
             display: block;
@@ -35,58 +36,101 @@
         .screen.active {
             display: flex;
         }
+        #loginScreen, #registerScreen {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
         #startScreen {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         .title {
-            font-size: 72px;
-            font-weight: bold;
-            text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+            font-size: 82px;
+            font-weight: 900;
+            text-shadow: 0 8px 16px rgba(0,0,0,0.6);
             margin-bottom: 20px;
+            letter-spacing: 3px;
+            background: linear-gradient(45deg, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .subtitle {
             font-size: 24px;
             margin-bottom: 40px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            opacity: 0.9;
         }
         .btn {
-            padding: 20px 60px;
-            font-size: 28px;
+            padding: 18px 50px;
+            font-size: 22px;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            border-radius: 15px;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
+            margin: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         .btn:hover {
-            transform: scale(1.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+        }
+        .input-field {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            margin: 10px;
+            width: 350px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        .input-field::placeholder {
+            color: rgba(255,255,255,0.6);
         }
         #multiplayerScreen {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
         }
-        .peer-id-display {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            border-radius: 10px;
+        .room-code-box {
+            background: rgba(0,0,0,0.4);
+            padding: 25px 40px;
+            border-radius: 20px;
             margin: 20px 0;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
+            letter-spacing: 4px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.2);
         }
         .players-list {
             background: rgba(0,0,0,0.3);
-            padding: 15px 30px;
-            border-radius: 10px;
+            padding: 20px 35px;
+            border-radius: 20px;
             margin: 20px 0;
-            min-width: 300px;
+            min-width: 350px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
         .player-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         #hud {
             position: absolute;
@@ -108,58 +152,198 @@
         .health-container {
             text-align: center;
             margin: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
         .health-bar-bg {
-            background: #333;
-            padding: 5px;
-            border-radius: 5px;
-            margin-top: 5px;
+            background: rgba(0,0,0,0.6);
+            padding: 6px;
+            border-radius: 10px;
+            margin-top: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
         }
         .health-bar {
-            height: 12px;
+            height: 14px;
             transition: width 0.3s;
+            border-radius: 7px;
         }
         #winnerScreen {
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             color: white;
         }
         .winner-text {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: bold;
             margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.8);
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.8); }
+            50% { text-shadow: 0 0 40px rgba(255,215,0,1); }
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 20;
+        }
+        .coins {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #shopScreen {
+            background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+            color: white;
+        }
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 200px);
+            gap: 20px;
+            padding: 20px;
+            max-width: 800px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .shop-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .shop-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.2);
+        }
+        .shop-item.owned {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+        .character-preview {
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        #settingsScreen {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+        .settings-panel {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            min-width: 400px;
+        }
+        .setting-item {
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
     
-    <div id="startScreen" class="screen active">
+    <div class="user-info" id="userInfo" style="display:none;">
+        <div id="username"></div>
+        <div class="coins">💰 <span id="coinCount">0</span></div>
+    </div>
+    
+    <div id="loginScreen" class="screen active">
         <h1 class="title">BOX BATTLES</h1>
-        <p class="subtitle">Fight inside the arena!</p>
-        <button class="btn" onclick="game.showLocal()">PLAY LOCAL</button>
+        <p class="subtitle">Login to start fighting!</p>
+        <input type="text" id="loginUsername" class="input-field" placeholder="Username">
+        <input type="password" id="loginPassword" class="input-field" placeholder="Password">
+        <button class="btn btn-success" onclick="game.login()">LOGIN</button>
+        <button class="btn" onclick="game.showRegister()">CREATE ACCOUNT</button>
+        <button class="btn" onclick="game.playAsGuest()">PLAY AS GUEST</button>
+    </div>
+    
+    <div id="registerScreen" class="screen">
+        <h1 class="title">CREATE ACCOUNT</h1>
+        <input type="text" id="regUsername" class="input-field" placeholder="Username">
+        <input type="password" id="regPassword" class="input-field" placeholder="Password">
+        <input type="password" id="regConfirmPassword" class="input-field" placeholder="Confirm Password">
+        <button class="btn btn-success" onclick="game.register()">REGISTER</button>
+        <button class="btn" onclick="game.showLogin()">BACK TO LOGIN</button>
+    </div>
+    
+    <div id="startScreen" class="screen">
+        <h1 class="title">BOX BATTLES</h1>
+        <p class="subtitle">Choose your battle mode!</p>
+        <button class="btn" onclick="game.showLocal()">LOCAL MULTIPLAYER</button>
         <button class="btn" onclick="game.showMultiplayer()">ONLINE PARTY</button>
         <button class="btn" onclick="game.showBotSelect()">VS BOT</button>
+        <button class="btn" onclick="game.showShop()" id="shopBtn" style="display:none; background: linear-gradient(135deg, #f093fb, #f5576c);">💰 SHOP</button>
+        <button class="btn" onclick="game.showSettings()">⚙️ SETTINGS</button>
+        <button class="btn btn-danger" onclick="game.logout()">LOGOUT</button>
     </div>
     
     <div id="botSelectScreen" class="screen">
         <h1 class="title">SELECT DIFFICULTY</h1>
-        <button class="btn" onclick="game.start('bot-easy')" style="background: linear-gradient(45deg, #4CAF50, #45a049);">EASY</button>
-        <button class="btn" onclick="game.start('bot-medium')" style="background: linear-gradient(45deg, #ff9800, #f57c00);">MEDIUM</button>
-        <button class="btn" onclick="game.start('bot-hard')" style="background: linear-gradient(45deg, #f44336, #d32f2f);">HARD</button>
+        <button class="btn btn-success" onclick="game.start('bot-easy')">🟢 EASY</button>
+        <button class="btn" onclick="game.start('bot-medium')" style="background: linear-gradient(135deg, #ff9800, #f57c00);">🟡 MEDIUM</button>
+        <button class="btn btn-danger" onclick="game.start('bot-hard')">🔴 HARD</button>
         <button class="btn" onclick="game.showStart()">BACK</button>
     </div>
     
     <div id="multiplayerScreen" class="screen">
         <h1 class="title">ONLINE PARTY</h1>
-        <div class="peer-id-display">
-            Room Code: <span id="roomCode">...</span>
+        <div class="room-code-box">
+            CODE: <span id="roomCode">...</span>
         </div>
         <div class="players-list">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Players in Room:</div>
             <div id="playersList"></div>
         </div>
-        <input type="text" id="codeInput" placeholder="Enter Code" maxlength="8" style="padding: 15px; font-size: 20px; border-radius: 10px; margin: 10px;">
-        <button class="btn" onclick="game.join()">JOIN</button>
-        <button class="btn" id="startBtn" style="display:none;" onclick="game.startOnline()">START GAME</button>
+        <input type="text" id="codeInput" class="input-field" placeholder="Enter 8-Character Code" maxlength="8">
+        <button class="btn btn-success" onclick="game.join()">JOIN ROOM</button>
+        <button class="btn" id="startBtn" style="display:none; background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="game.startOnline()">START GAME</button>
+        <button class="btn" onclick="game.showStart()">BACK</button>
+    </div>
+    
+    <div id="shopScreen" class="screen">
+        <h1 class="title">CHARACTER SHOP</h1>
+        <p class="subtitle">Unlock new characters with coins!</p>
+        <div class="shop-grid" id="shopGrid"></div>
+        <button class="btn" onclick="game.showStart()">BACK</button>
+    </div>
+    
+    <div id="settingsScreen" class="screen">
+        <h1 class="title">SETTINGS</h1>
+        <div class="settings-panel">
+            <div class="setting-item">
+                <span>Master Volume</span>
+                <input type="range" min="0" max="100" value="100" id="volumeSlider" style="width: 150px;">
+            </div>
+            <div class="setting-item">
+                <span>Show FPS</span>
+                <input type="checkbox" id="fpsToggle">
+            </div>
+            <div class="setting-item">
+                <span>Graphics Quality</span>
+                <select id="qualitySelect" style="padding: 8px; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                    <option>Low</option>
+                    <option selected>Medium</option>
+                    <option>High</option>
+                </select>
+            </div>
+        </div>
         <button class="btn" onclick="game.showStart()">BACK</button>
     </div>
     
@@ -167,593 +351,13 @@
     
     <div id="winnerScreen" class="screen">
         <div class="winner-text" id="winnerText"></div>
-        <button class="btn" onclick="game.reset()">PLAY AGAIN</button>
-        <button class="btn" onclick="game.showStart()">MENU</button>
+        <div style="font-size: 24px; margin-bottom: 20px; color: #ffd700;" id="coinsEarned"></div>
+        <button class="btn btn-success" onclick="game.reset()">PLAY AGAIN</button>
+        <button class="btn" onclick="game.showStart()">MAIN MENU</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        var game = (function() {
-            var scene, camera, renderer;
-            var players = [];
-            var gameMode = null;
-            var peer, connections = [];
-            var isHost = false;
-            var myPlayerId = 0;
-            var animationId = null;
-            var roomCode = '';
-            var playersInRoom = [];
-            
-            var playerColors = [0xff0000, 0x0000ff, 0x00ff00, 0xffff00];
-            var playerNames = ['Red', 'Blue', 'Green', 'Yellow'];
-            
-            var gameState = {
-                players: [
-                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: -4, y: 1, z: 0 } },
-                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: 4, y: 1, z: 0 } },
-                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: -4, y: 1, z: 4 } },
-                    { health: 100, jumping: false, velocity: { x: 0, y: 0, z: 0 }, position: { x: 4, y: 1, z: 4 } }
-                ]
-            };
-            
-            var keys = {};
-            var moveSpeed = 0.15;
-            var jumpPower = 0.3;
-            var gravity = 0.015;
-            var attackRange = 2.5;
-            var attackCooldowns = [0, 0, 0, 0];
-            
-            function generateRoomCode() {
-                var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                var code = '';
-                for (var i = 0; i < 8; i++) {
-                    code += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return code;
-            }
-            
-            function initPeer() {
-                roomCode = generateRoomCode();
-                peer = new Peer(roomCode);
-                
-                peer.on('open', function(id) {
-                    document.getElementById('roomCode').textContent = roomCode;
-                    isHost = true;
-                    myPlayerId = 0;
-                    playersInRoom = [{ id: roomCode, name: 'Player 1 (You)' }];
-                    updatePlayersList();
-                    document.getElementById('startBtn').style.display = 'block';
-                });
-                
-                peer.on('connection', function(conn) {
-                    if (playersInRoom.length < 4) {
-                        connections.push(conn);
-                        setupConnection(conn);
-                        var playerNum = playersInRoom.length + 1;
-                        playersInRoom.push({ id: conn.peer, name: 'Player ' + playerNum });
-                        updatePlayersList();
-                        broadcastPlayersList();
-                    }
-                });
-            }
-            
-            function join() {
-                var code = document.getElementById('codeInput').value.trim().toUpperCase();
-                if (code.length !== 8) {
-                    alert('Room code must be 8 characters!');
-                    return;
-                }
-                
-                roomCode = code;
-                peer = new Peer();
-                
-                peer.on('open', function(id) {
-                    var conn = peer.connect(roomCode);
-                    connections.push(conn);
-                    setupConnection(conn);
-                    isHost = false;
-                });
-            }
-            
-            function setupConnection(conn) {
-                conn.on('open', function() {
-                    if (!isHost) {
-                        conn.send({ type: 'requestJoin' });
-                    }
-                });
-                
-                conn.on('data', function(data) {
-                    if (data.type === 'requestJoin' && isHost) {
-                        var newPlayerId = playersInRoom.length;
-                        conn.send({ 
-                            type: 'joinAccepted', 
-                            playerId: newPlayerId,
-                            players: playersInRoom
-                        });
-                        broadcastPlayersList();
-                    } else if (data.type === 'joinAccepted') {
-                        myPlayerId = data.playerId;
-                        playersInRoom = data.players;
-                        var myName = 'Player ' + (myPlayerId + 1) + ' (You)';
-                        playersInRoom.push({ id: conn.peer, name: myName });
-                        updatePlayersList();
-                    } else if (data.type === 'playersList') {
-                        playersInRoom = data.players;
-                        var found = false;
-                        for (var i = 0; i < playersInRoom.length; i++) {
-                            if (playersInRoom[i].name.indexOf('(You)') !== -1) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found && myPlayerId < playersInRoom.length) {
-                            playersInRoom[myPlayerId].name += ' (You)';
-                        }
-                        updatePlayersList();
-                    } else if (data.type === 'startGame') {
-                        start('online');
-                    } else if (data.type === 'gameState' && !isHost) {
-                        gameState = data.state;
-                        updateVisuals();
-                    } else if (data.type === 'input' && isHost) {
-                        processPlayerInput(data.playerId, data.keys);
-                    }
-                });
-            }
-            
-            function broadcastPlayersList() {
-                for (var i = 0; i < connections.length; i++) {
-                    if (connections[i].open) {
-                        connections[i].send({ type: 'playersList', players: playersInRoom });
-                    }
-                }
-            }
-            
-            function updatePlayersList() {
-                var html = '';
-                for (var i = 0; i < playersInRoom.length; i++) {
-                    html += '<div class="player-item">' + playersInRoom[i].name + '</div>';
-                }
-                document.getElementById('playersList').innerHTML = html;
-            }
-            
-            function startOnline() {
-                if (!isHost) return;
-                
-                for (var i = 0; i < connections.length; i++) {
-                    if (connections[i].open) {
-                        connections[i].send({ type: 'startGame' });
-                    }
-                }
-                start('online');
-            }
-            
-            function sendGameState() {
-                if (!isHost) return;
-                for (var i = 0; i < connections.length; i++) {
-                    if (connections[i].open) {
-                        connections[i].send({ type: 'gameState', state: gameState });
-                    }
-                }
-            }
-            
-            function sendInput() {
-                if (isHost || connections.length === 0) return;
-                connections[0].send({ type: 'input', playerId: myPlayerId, keys: keys });
-            }
-            
-            function showStart() {
-                document.getElementById('startScreen').classList.add('active');
-                document.getElementById('multiplayerScreen').classList.remove('active');
-                document.getElementById('botSelectScreen').classList.remove('active');
-                document.getElementById('winnerScreen').classList.remove('active');
-                document.getElementById('hud').classList.remove('active');
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                }
-                if (peer) {
-                    peer.destroy();
-                    peer = null;
-                }
-                connections = [];
-                playersInRoom = [];
-            }
-            
-            function showBotSelect() {
-                document.getElementById('startScreen').classList.remove('active');
-                document.getElementById('botSelectScreen').classList.add('active');
-            }
-            
-            function showLocal() {
-                start('local');
-            }
-            
-            function showMultiplayer() {
-                document.getElementById('startScreen').classList.remove('active');
-                document.getElementById('multiplayerScreen').classList.add('active');
-                if (!peer) initPeer();
-            }
-            
-            function initThreeJS() {
-                var canvas = document.getElementById('gameCanvas');
-                scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x87ceeb);
-                
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(0, 12, 18);
-                camera.lookAt(0, 0, 0);
-                
-                renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                renderer.shadowMap.enabled = true;
-                
-                var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-                scene.add(ambientLight);
-                
-                var directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                directionalLight.position.set(5, 10, 5);
-                directionalLight.castShadow = true;
-                scene.add(directionalLight);
-                
-                var floorGeometry = new THREE.BoxGeometry(12, 0.5, 12);
-                var floorMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
-                var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-                floor.position.y = -0.25;
-                floor.receiveShadow = true;
-                scene.add(floor);
-                
-                var wallMaterial = new THREE.MeshStandardMaterial({ 
-                    color: 0x8b4513, 
-                    transparent: true, 
-                    opacity: 0.4,
-                    side: THREE.DoubleSide
-                });
-                
-                var backWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
-                backWall.position.set(0, 3, -6);
-                scene.add(backWall);
-                
-                var frontWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
-                frontWall.position.set(0, 3, 6);
-                scene.add(frontWall);
-                
-                var leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
-                leftWall.position.set(-6, 3, 0);
-                scene.add(leftWall);
-                
-                var rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
-                rightWall.position.set(6, 3, 0);
-                scene.add(rightWall);
-                
-                window.addEventListener('resize', function() {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-            }
-            
-            function start(mode) {
-                gameMode = mode;
-                document.getElementById('startScreen').classList.remove('active');
-                document.getElementById('multiplayerScreen').classList.remove('active');
-                document.getElementById('botSelectScreen').classList.remove('active');
-                document.getElementById('hud').classList.add('active');
-                
-                var numPlayers = 2;
-                if (mode === 'online') {
-                    numPlayers = playersInRoom.length;
-                }
-                
-                for (var i = 0; i < players.length; i++) {
-                    scene.remove(players[i]);
-                }
-                players = [];
-                
-                for (var i = 0; i < numPlayers; i++) {
-                    gameState.players[i].health = 100;
-                    gameState.players[i].jumping = false;
-                    gameState.players[i].velocity = { x: 0, y: 0, z: 0 };
-                    attackCooldowns[i] = 0;
-                    
-                    var playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-                    var playerMaterial = new THREE.MeshStandardMaterial({ color: playerColors[i] });
-                    var player = new THREE.Mesh(playerGeometry, playerMaterial);
-                    player.castShadow = true;
-                    players.push(player);
-                    scene.add(player);
-                }
-                
-                if (!renderer) {
-                    initThreeJS();
-                }
-                
-                updateHUD(numPlayers);
-                updateVisuals();
-                animate();
-            }
-            
-            function updateHUD(numPlayers) {
-                var html = '';
-                for (var i = 0; i < numPlayers; i++) {
-                    var colorHex = playerColors[i].toString(16).padStart(6, '0');
-                    html += '<div class="health-container">';
-                    html += '<div style="color:#' + colorHex + '">' + playerNames[i] + '</div>';
-                    html += '<div class="health-bar-bg">';
-                    html += '<div id="h' + i + '" class="health-bar" style="background:#' + colorHex + ';width:120px"></div>';
-                    html += '</div></div>';
-                }
-                document.getElementById('hud').innerHTML = html;
-            }
-            
-            function updateHealthBars() {
-                for (var i = 0; i < players.length; i++) {
-                    var elem = document.getElementById('h' + i);
-                    if (elem) {
-                        elem.style.width = (gameState.players[i].health * 1.2) + 'px';
-                    }
-                }
-            }
-            
-            function updateVisuals() {
-                for (var i = 0; i < players.length; i++) {
-                    if (players[i]) {
-                        players[i].position.set(
-                            gameState.players[i].position.x, 
-                            gameState.players[i].position.y, 
-                            gameState.players[i].position.z
-                        );
-                    }
-                }
-                updateHealthBars();
-            }
-            
-            function createAttackEffect(position, color) {
-                var effect = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.5, 16, 16),
-                    new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.7 })
-                );
-                effect.position.copy(position);
-                scene.add(effect);
-                
-                setTimeout(function() {
-                    scene.remove(effect);
-                }, 200);
-            }
-            
-            function botAI() {
-                var botKeys = {};
-                var p1Pos = gameState.players[0].position;
-                var p2Pos = gameState.players[1].position;
-                var distance = Math.sqrt(
-                    Math.pow(p1Pos.x - p2Pos.x, 2) + 
-                    Math.pow(p1Pos.z - p2Pos.z, 2)
-                );
-                
-                var reactionThreshold = 0.95;
-                var jumpThreshold = 0.98;
-                var chaseDistance = 3;
-                
-                if (gameMode === 'bot-easy') {
-                    reactionThreshold = 0.90;
-                    jumpThreshold = 0.99;
-                    chaseDistance = 4;
-                } else if (gameMode === 'bot-medium') {
-                    reactionThreshold = 0.95;
-                    jumpThreshold = 0.98;
-                    chaseDistance = 3;
-                } else if (gameMode === 'bot-hard') {
-                    reactionThreshold = 0.97;
-                    jumpThreshold = 0.96;
-                    chaseDistance = 2;
-                }
-                
-                if (distance > chaseDistance) {
-                    if (p1Pos.x < p2Pos.x) {
-                        botKeys['arrowleft'] = true;
-                    } else {
-                        botKeys['arrowright'] = true;
-                    }
-                    
-                    if (p1Pos.z < p2Pos.z) {
-                        botKeys['arrowup'] = true;
-                    } else {
-                        botKeys['arrowdown'] = true;
-                    }
-                }
-                
-                if (distance < attackRange && Math.random() > reactionThreshold) {
-                    botKeys['enter'] = true;
-                }
-                
-                if (Math.random() > jumpThreshold && !gameState.players[1].jumping) {
-                    botKeys['shift'] = true;
-                }
-                
-                return botKeys;
-            }
-            
-            function processPlayerInput(playerNum, inputKeys) {
-                if (playerNum >= players.length) return;
-                
-                var state = gameState.players[playerNum];
-                var controls;
-                
-                if (gameMode === 'online') {
-                    controls = { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' };
-                    if (inputKeys['arrowup']) inputKeys['w'] = true;
-                    if (inputKeys['arrowdown']) inputKeys['s'] = true;
-                    if (inputKeys['arrowleft']) inputKeys['a'] = true;
-                    if (inputKeys['arrowright']) inputKeys['d'] = true;
-                    if (inputKeys['shift']) inputKeys['q'] = true;
-                    if (inputKeys['enter']) inputKeys['e'] = true;
-                } else {
-                    controls = (playerNum === 0) ? 
-                        { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' } :
-                        { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter' };
-                }
-                
-                if (inputKeys[controls.up]) {
-                    state.velocity.z = -moveSpeed;
-                } else if (inputKeys[controls.down]) {
-                    state.velocity.z = moveSpeed;
-                } else {
-                    state.velocity.z = 0;
-                }
-                
-                if (inputKeys[controls.left]) {
-                    state.velocity.x = -moveSpeed;
-                } else if (inputKeys[controls.right]) {
-                    state.velocity.x = moveSpeed;
-                } else {
-                    state.velocity.x = 0;
-                }
-                
-                if (inputKeys[controls.jump] && !state.jumping) {
-                    state.velocity.y = jumpPower;
-                    state.jumping = true;
-                }
-                
-                if (inputKeys[controls.attack] && attackCooldowns[playerNum] <= 0) {
-                    for (var i = 0; i < players.length; i++) {
-                        if (i === playerNum) continue;
-                        
-                        var opponent = gameState.players[i];
-                        var distance = Math.sqrt(
-                            Math.pow(state.position.x - opponent.position.x, 2) +
-                            Math.pow(state.position.y - opponent.position.y, 2) +
-                            Math.pow(state.position.z - opponent.position.z, 2)
-                        );
-                        
-                        if (distance < attackRange) {
-                            opponent.health -= 5;
-                            createAttackEffect(
-                                new THREE.Vector3(opponent.position.x, opponent.position.y, opponent.position.z),
-                                playerColors[playerNum]
-                            );
-                            
-                            var dx = opponent.position.x - state.position.x;
-                            var dz = opponent.position.z - state.position.z;
-                            var len = Math.sqrt(dx * dx + dz * dz);
-                            if (len > 0) {
-                                opponent.velocity.x += (dx / len) * 0.6;
-                                opponent.velocity.y += 0.3;
-                                opponent.velocity.z += (dz / len) * 0.6;
-                            }
-                            
-                            if (opponent.health <= 0) {
-                                checkWinner();
-                            }
-                        }
-                    }
-                    attackCooldowns[playerNum] = 30;
-                }
-            }
-            
-            function checkWinner() {
-                var alive = [];
-                for (var i = 0; i < players.length; i++) {
-                    if (gameState.players[i].health > 0) {
-                        alive.push(i);
-                    }
-                }
-                
-                if (alive.length === 1) {
-                    endGame(playerNames[alive[0]] + ' Wins!');
-                } else if (alive.length === 0) {
-                    endGame('Draw!');
-                }
-            }
-            
-            function animate() {
-                var aliveCount = 0;
-                for (var i = 0; i < players.length; i++) {
-                    if (gameState.players[i].health > 0) {
-                        aliveCount++;
-                    }
-                }
-                
-                if (aliveCount <= 1) {
-                    if (renderer) renderer.render(scene, camera);
-                    return;
-                }
-                
-                animationId = requestAnimationFrame(animate);
-                
-                if (gameMode === 'local') {
-                    processPlayerInput(0, keys);
-                    processPlayerInput(1, keys);
-                } else if (gameMode === 'bot-easy' || gameMode === 'bot-medium' || gameMode === 'bot-hard') {
-                    processPlayerInput(0, keys);
-                    var botKeys = botAI();
-                    processPlayerInput(1, botKeys);
-                } else if (gameMode === 'online') {
-                    if (isHost) {
-                        processPlayerInput(myPlayerId, keys);
-                        sendGameState();
-                    } else {
-                        processPlayerInput(myPlayerId, keys);
-                        sendInput();
-                    }
-                }
-                
-                for (var i = 0; i < players.length; i++) {
-                    gameState.players[i].velocity.y -= gravity;
-                    
-                    gameState.players[i].position.x += gameState.players[i].velocity.x;
-                    gameState.players[i].position.y += gameState.players[i].velocity.y;
-                    gameState.players[i].position.z += gameState.players[i].velocity.z;
-                    
-                    if (gameState.players[i].position.y <= 1) {
-                        gameState.players[i].position.y = 1;
-                        gameState.players[i].velocity.y = 0;
-                        gameState.players[i].jumping = false;
-                    }
-                    
-                    var maxPos = 5.5;
-                    gameState.players[i].position.x = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.x));
-                    gameState.players[i].position.z = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.z));
-                    
-                    if (attackCooldowns[i] > 0) attackCooldowns[i]--;
-                }
-                
-                updateVisuals();
-                renderer.render(scene, camera);
-            }
-            
-            function endGame(winnerText) {
-                document.getElementById('winnerText').textContent = winnerText;
-                document.getElementById('winnerScreen').classList.add('active');
-                document.getElementById('hud').classList.remove('active');
-            }
-            
-            function reset() {
-                document.getElementById('winnerScreen').classList.remove('active');
-                start(gameMode);
-            }
-            
-            window.addEventListener('keydown', function(e) {
-                keys[e.key.toLowerCase()] = true;
-            });
-            
-            window.addEventListener('keyup', function(e) {
-                keys[e.key.toLowerCase()] = false;
-            });
-            
-            initThreeJS();
-            
-            return {
-                showStart: showStart,
-                showLocal: showLocal,
-                showBotSelect: showBotSelect,
-                showMultiplayer: showMultiplayer,
-                start: start,
-                join: join,
-                startOnline: startOnline,
-                reset: reset
-            };
-        })();
-    </script>
+    <script src="index.js"></script>
 </body>
 </html>
