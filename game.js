@@ -279,19 +279,39 @@ var game = (function() {
     function join() {
         var code = document.getElementById('codeInput').value.trim().toUpperCase();
         if (code.length !== 8) {
-            alert('Room code must be 8 characters!');
+            document.getElementById('joinStatus').textContent = '❌ Room code must be 8 characters!';
+            document.getElementById('joinStatus').style.color = '#ff6b6b';
             return;
         }
         
+        document.getElementById('joinStatus').textContent = '🔄 Connecting...';
+        document.getElementById('joinStatus').style.color = '#ffd700';
+        
         roomCode = code;
-        peer = new Peer();
+        
+        if (!peer || peer.destroyed) {
+            peer = new Peer();
+        }
         
         peer.on('open', function(id) {
             var conn = peer.connect(roomCode);
             if (!conn) {
-                alert('Failed to connect to room!');
+                document.getElementById('joinStatus').textContent = '❌ Failed to connect to room!';
+                document.getElementById('joinStatus').style.color = '#ff6b6b';
                 return;
             }
+            
+            conn.on('open', function() {
+                document.getElementById('joinStatus').textContent = '✅ Connected! Waiting for host to start...';
+                document.getElementById('joinStatus').style.color = '#4CAF50';
+            });
+            
+            conn.on('error', function(err) {
+                document.getElementById('joinStatus').textContent = '❌ Connection error!';
+                document.getElementById('joinStatus').style.color = '#ff6b6b';
+                console.error('Connection Error:', err);
+            });
+            
             connections.push(conn);
             setupConnection(conn);
             isHost = false;
@@ -299,7 +319,8 @@ var game = (function() {
         
         peer.on('error', function(err) {
             console.error('PeerJS Error:', err);
-            alert('Could not connect to room. Check the code and try again.');
+            document.getElementById('joinStatus').textContent = '❌ Could not find room. Check the code!';
+            document.getElementById('joinStatus').style.color = '#ff6b6b';
         });
     }
     
@@ -440,7 +461,20 @@ var game = (function() {
     function showMultiplayer() {
         hideAllScreens();
         document.getElementById('multiplayerScreen').classList.add('active');
+    }
+    
+    function hostGame() {
+        hideAllScreens();
+        document.getElementById('hostScreen').classList.add('active');
         if (!peer) initPeer();
+    }
+    
+    function showJoinGame() {
+        hideAllScreens();
+        document.getElementById('joinScreen').classList.add('active');
+        if (!peer) {
+            peer = new Peer();
+        }
     }
     
     function initThreeJS() {
@@ -846,6 +880,8 @@ var game = (function() {
         showLocal: showLocal,
         showBotSelect: showBotSelect,
         showMultiplayer: showMultiplayer,
+        hostGame: hostGame,
+        showJoinGame: showJoinGame,
         showShop: showShop,
         showSettings: showSettings,
         start: start,
