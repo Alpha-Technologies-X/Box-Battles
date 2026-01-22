@@ -304,6 +304,14 @@
     
     <div id="multiplayerScreen" class="screen">
         <h1 class="title">ONLINE PARTY</h1>
+        <p class="subtitle">Host a game or join a friend!</p>
+        <button class="btn btn-success" onclick="game.hostGame()">HOST GAME</button>
+        <button class="btn" onclick="game.showJoinGame()">JOIN GAME</button>
+        <button class="btn" onclick="game.showStart()">BACK</button>
+    </div>
+    
+    <div id="hostScreen" class="screen">
+        <h1 class="title">HOSTING GAME</h1>
         <div class="room-code-box">
             CODE: <span id="roomCode">...</span>
         </div>
@@ -311,10 +319,17 @@
             <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Players in Room:</div>
             <div id="playersList"></div>
         </div>
+        <button class="btn" id="startBtn" style="display:none; background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="game.startOnline()">START GAME</button>
+        <button class="btn" onclick="game.showMultiplayer()">BACK</button>
+    </div>
+    
+    <div id="joinScreen" class="screen">
+        <h1 class="title">JOIN GAME</h1>
+        <p class="subtitle">Enter the host's room code</p>
         <input type="text" id="codeInput" class="input-field" placeholder="Enter 8-Character Code" maxlength="8">
         <button class="btn btn-success" onclick="game.join()">JOIN ROOM</button>
-        <button class="btn" id="startBtn" style="display:none; background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="game.startOnline()">START GAME</button>
-        <button class="btn" onclick="game.showStart()">BACK</button>
+        <div id="joinStatus" style="margin-top: 20px; font-size: 18px;"></div>
+        <button class="btn" onclick="game.showMultiplayer()">BACK</button>
     </div>
     
     <div id="shopScreen" class="screen">
