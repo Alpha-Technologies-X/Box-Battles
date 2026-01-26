@@ -1,5 +1,6 @@
 var game = (function() {
     var scene, camera, renderer;
+    var camera2, renderer2;
     var players = [];
     var gameMode = null;
     var peer, connections = [];
@@ -10,6 +11,7 @@ var game = (function() {
     var playersInRoom = [];
     var currentUser = null;
     var isGuest = false;
+    var playerCameras = [];
     
     var characterSkins = [
         { name: 'Classic Red', color: 0xff0000, cost: 0, owned: true },
@@ -37,11 +39,15 @@ var game = (function() {
     };
     
     var keys = {};
-    var moveSpeed = 0.15;
-    var jumpPower = 0.3;
+    var moveSpeed = 0.2;
+    var jumpPower = 0.4;
     var gravity = 0.015;
-    var attackRange = 2.5;
+    var attackRange = 3;
     var attackCooldowns = [0, 0, 0, 0];
+    var mouseSensitivity = 0.002;
+    var rotationX = [0, 0, 0, 0];
+    var rotationY = [0, 0, 0, 0];
+    var mouseMovement = { x: 0, y: 0 };
     
     function saveToStorage(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
@@ -483,8 +489,6 @@ var game = (function() {
         scene.background = new THREE.Color(0x87ceeb);
         
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 12, 18);
-        camera.lookAt(0, 0, 0);
         
         renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -498,7 +502,7 @@ var game = (function() {
         directionalLight.castShadow = true;
         scene.add(directionalLight);
         
-        var floorGeometry = new THREE.BoxGeometry(12, 0.5, 12);
+        var floorGeometry = new THREE.BoxGeometry(30, 0.5, 30);
         var floorMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = -0.25;
@@ -507,31 +511,54 @@ var game = (function() {
         
         var wallMaterial = new THREE.MeshStandardMaterial({ 
             color: 0x8b4513, 
-            transparent: true, 
-            opacity: 0.4,
-            side: THREE.DoubleSide
+            transparent: false, 
+            opacity: 1
         });
         
-        var backWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
-        backWall.position.set(0, 3, -6);
+        var backWall = new THREE.Mesh(new THREE.BoxGeometry(30, 8, 0.5), wallMaterial);
+        backWall.position.set(0, 4, -15);
+        backWall.receiveShadow = true;
         scene.add(backWall);
         
-        var frontWall = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 0.5), wallMaterial);
-        frontWall.position.set(0, 3, 6);
+        var frontWall = new THREE.Mesh(new THREE.BoxGeometry(30, 8, 0.5), wallMaterial);
+        frontWall.position.set(0, 4, 15);
+        frontWall.receiveShadow = true;
         scene.add(frontWall);
         
-        var leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
-        leftWall.position.set(-6, 3, 0);
+        var leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 30), wallMaterial);
+        leftWall.position.set(-15, 4, 0);
+        leftWall.receiveShadow = true;
         scene.add(leftWall);
         
-        var rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 6, 12), wallMaterial);
-        rightWall.position.set(6, 3, 0);
+        var rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 30), wallMaterial);
+        rightWall.position.set(15, 4, 0);
+        rightWall.receiveShadow = true;
         scene.add(rightWall);
         
+        canvas.addEventListener('click', function() {
+            canvas.requestPointerLock();
+        });
+        
+        document.addEventListener('mousemove', function(e) {
+            if (document.pointerLockElement === canvas) {
+                mouseMovement.x = e.movementX;
+                mouseMovement.y = e.movementY;
+            }
+        });
+        
         window.addEventListener('resize', function() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (gameMode === 'local') {
+                camera.aspect = (window.innerWidth / 2) / window.innerHeight;
+                camera2.aspect = (window.innerWidth / 2) / window.innerHeight;
+                camera.updateProjectionMatrix();
+                camera2.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth / 2, window.innerHeight);
+                renderer2.setSize(window.innerWidth / 2, window.innerHeight);
+            } else {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
         });
     }
     
@@ -551,12 +578,15 @@ var game = (function() {
             }
         }
         players = [];
+        playerCameras = [];
         
         for (var i = 0; i < numPlayers; i++) {
             gameState.players[i].health = 100;
             gameState.players[i].jumping = false;
             gameState.players[i].velocity = { x: 0, y: 0, z: 0 };
             attackCooldowns[i] = 0;
+            rotationX[i] = 0;
+            rotationY[i] = 0;
             
             var playerGeometry = new THREE.BoxGeometry(1, 2, 1);
             var playerMaterial = new THREE.MeshStandardMaterial({ color: playerColors[i] });
@@ -564,6 +594,40 @@ var game = (function() {
             player.castShadow = true;
             players.push(player);
             scene.add(player);
+            
+            var cam = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            playerCameras.push(cam);
+        }
+        
+        if (gameMode === 'local') {
+            var canvas = document.getElementById('gameCanvas');
+            canvas.style.width = '50%';
+            canvas.style.float = 'left';
+            
+            var canvas2 = document.createElement('canvas');
+            canvas2.id = 'gameCanvas2';
+            canvas2.style.width = '50%';
+            canvas2.style.float = 'right';
+            document.body.appendChild(canvas2);
+            
+            camera = playerCameras[0];
+            camera2 = playerCameras[1];
+            
+            camera.aspect = (window.innerWidth / 2) / window.innerHeight;
+            camera2.aspect = (window.innerWidth / 2) / window.innerHeight;
+            camera.updateProjectionMatrix();
+            camera2.updateProjectionMatrix();
+            
+            renderer.setSize(window.innerWidth / 2, window.innerHeight);
+            renderer2 = new THREE.WebGLRenderer({ canvas: canvas2, antialias: true });
+            renderer2.setSize(window.innerWidth / 2, window.innerHeight);
+            renderer2.shadowMap.enabled = true;
+        } else {
+            camera = playerCameras[myPlayerId] || playerCameras[0];
+            var canvas = document.getElementById('gameCanvas');
+            canvas.style.width = '100%';
+            canvas.style.float = 'none';
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
         
         if (!renderer) {
@@ -605,6 +669,18 @@ var game = (function() {
                     gameState.players[i].position.y, 
                     gameState.players[i].position.z
                 );
+                
+                if (playerCameras[i]) {
+                    playerCameras[i].position.set(
+                        gameState.players[i].position.x,
+                        gameState.players[i].position.y + 1.6,
+                        gameState.players[i].position.z
+                    );
+                    
+                    playerCameras[i].rotation.order = 'YXZ';
+                    playerCameras[i].rotation.y = rotationY[i];
+                    playerCameras[i].rotation.x = rotationX[i];
+                }
             }
         }
         updateHealthBars();
@@ -682,33 +758,63 @@ var game = (function() {
         var controls;
         
         if (gameMode === 'online') {
-            controls = { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' };
-            if (inputKeys['arrowup']) inputKeys['w'] = true;
-            if (inputKeys['arrowdown']) inputKeys['s'] = true;
-            if (inputKeys['arrowleft']) inputKeys['a'] = true;
-            if (inputKeys['arrowright']) inputKeys['d'] = true;
-            if (inputKeys['shift']) inputKeys['q'] = true;
-            if (inputKeys['enter']) inputKeys['e'] = true;
+            controls = { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e', lookUp: 'arrowup', lookDown: 'arrowdown', lookLeft: 'arrowleft', lookRight: 'arrowright' };
+        } else if (gameMode === 'local') {
+            controls = (playerNum === 0) ? 
+                { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e', lookUp: 'arrowup', lookDown: 'arrowdown', lookLeft: 'arrowleft', lookRight: 'arrowright' } :
+                { up: 'i', down: 'k', left: 'j', right: 'l', jump: 'u', attack: 'o', lookUp: 't', lookDown: 'g', lookLeft: 'f', lookRight: 'h' };
         } else {
             controls = (playerNum === 0) ? 
-                { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e' } :
-                { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter' };
+                { up: 'w', down: 's', left: 'a', right: 'd', jump: 'q', attack: 'e', lookUp: 'arrowup', lookDown: 'arrowdown', lookLeft: 'arrowleft', lookRight: 'arrowright' } :
+                { up: 'arrowup', down: 'arrowdown', left: 'arrowleft', right: 'arrowright', jump: 'shift', attack: 'enter', lookUp: 't', lookDown: 'g', lookLeft: 'f', lookRight: 'h' };
         }
+        
+        var cam = playerCameras[playerNum];
+        if (!cam) return;
+        
+        if (gameMode !== 'local' && playerNum === myPlayerId && document.pointerLockElement) {
+            rotationY[playerNum] -= mouseMovement.x * mouseSensitivity;
+            rotationX[playerNum] -= mouseMovement.y * mouseSensitivity;
+            rotationX[playerNum] = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX[playerNum]));
+            mouseMovement.x = 0;
+            mouseMovement.y = 0;
+        } else {
+            if (inputKeys[controls.lookLeft]) rotationY[playerNum] += 0.05;
+            if (inputKeys[controls.lookRight]) rotationY[playerNum] -= 0.05;
+            if (inputKeys[controls.lookUp]) rotationX[playerNum] += 0.05;
+            if (inputKeys[controls.lookDown]) rotationX[playerNum] -= 0.05;
+            rotationX[playerNum] = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX[playerNum]));
+        }
+        
+        var forward = new THREE.Vector3(
+            Math.sin(rotationY[playerNum]),
+            0,
+            Math.cos(rotationY[playerNum])
+        );
+        var right = new THREE.Vector3(
+            Math.sin(rotationY[playerNum] + Math.PI / 2),
+            0,
+            Math.cos(rotationY[playerNum] + Math.PI / 2)
+        );
+        
+        state.velocity.x = 0;
+        state.velocity.z = 0;
         
         if (inputKeys[controls.up]) {
-            state.velocity.z = -moveSpeed;
-        } else if (inputKeys[controls.down]) {
-            state.velocity.z = moveSpeed;
-        } else {
-            state.velocity.z = 0;
+            state.velocity.x += forward.x * moveSpeed;
+            state.velocity.z += forward.z * moveSpeed;
         }
-        
+        if (inputKeys[controls.down]) {
+            state.velocity.x -= forward.x * moveSpeed;
+            state.velocity.z -= forward.z * moveSpeed;
+        }
         if (inputKeys[controls.left]) {
-            state.velocity.x = -moveSpeed;
-        } else if (inputKeys[controls.right]) {
-            state.velocity.x = moveSpeed;
-        } else {
-            state.velocity.x = 0;
+            state.velocity.x -= right.x * moveSpeed;
+            state.velocity.z -= right.z * moveSpeed;
+        }
+        if (inputKeys[controls.right]) {
+            state.velocity.x += right.x * moveSpeed;
+            state.velocity.z += right.z * moveSpeed;
         }
         
         if (inputKeys[controls.jump] && !state.jumping) {
@@ -812,7 +918,7 @@ var game = (function() {
                 gameState.players[i].jumping = false;
             }
             
-            var maxPos = 5.5;
+            var maxPos = 14.5;
             gameState.players[i].position.x = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.x));
             gameState.players[i].position.z = Math.max(-maxPos, Math.min(maxPos, gameState.players[i].position.z));
             
@@ -820,7 +926,13 @@ var game = (function() {
         }
         
         updateVisuals();
-        renderer.render(scene, camera);
+        
+        if (gameMode === 'local') {
+            renderer.render(scene, camera);
+            renderer2.render(scene, camera2);
+        } else {
+            renderer.render(scene, camera);
+        }
     }
     
     function endGame(winnerText) {
