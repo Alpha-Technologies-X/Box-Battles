@@ -435,12 +435,22 @@ var game = (function() {
         document.getElementById('startScreen').classList.add('active');
         document.getElementById('hud').classList.remove('active');
         
+        var canvas2 = document.getElementById('gameCanvas2');
+        if (canvas2) {
+            document.body.removeChild(canvas2);
+        }
+        
+        var canvas = document.getElementById('gameCanvas');
+        canvas.style.width = '100%';
+        canvas.style.float = 'none';
+        
         for (var i = 0; i < players.length; i++) {
             if (players[i]) {
                 scene.remove(players[i]);
             }
         }
         players = [];
+        playerCameras = [];
         
         if (animationId) {
             cancelAnimationFrame(animationId);
@@ -453,6 +463,10 @@ var game = (function() {
         connections = [];
         playersInRoom = [];
         gameMode = null;
+        
+        if (renderer2) {
+            renderer2 = null;
+        }
     }
     
     function showBotSelect() {
@@ -954,18 +968,34 @@ var game = (function() {
     function reset() {
         document.getElementById('winnerScreen').classList.remove('active');
         
+        var canvas2 = document.getElementById('gameCanvas2');
+        if (canvas2) {
+            document.body.removeChild(canvas2);
+        }
+        
+        var canvas = document.getElementById('gameCanvas');
+        canvas.style.width = '100%';
+        canvas.style.float = 'none';
+        
         for (var i = 0; i < players.length; i++) {
             if (players[i]) {
                 scene.remove(players[i]);
             }
         }
         players = [];
+        playerCameras = [];
         
         for (var i = 0; i < 4; i++) {
             gameState.players[i].health = 100;
             gameState.players[i].jumping = false;
             gameState.players[i].velocity = { x: 0, y: 0, z: 0 };
             attackCooldowns[i] = 0;
+            rotationX[i] = 0;
+            rotationY[i] = 0;
+        }
+        
+        if (renderer2) {
+            renderer2 = null;
         }
         
         start(gameMode);
