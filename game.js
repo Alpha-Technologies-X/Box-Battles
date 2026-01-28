@@ -434,6 +434,7 @@ var game = (function() {
         hideAllScreens();
         document.getElementById('startScreen').classList.add('active');
         document.getElementById('hud').classList.remove('active');
+        document.getElementById('gameCanvas').classList.remove('active');
         
         var canvas2 = document.getElementById('gameCanvas2');
         if (canvas2) {
@@ -580,6 +581,7 @@ var game = (function() {
         gameMode = mode;
         hideAllScreens();
         document.getElementById('hud').classList.add('active');
+        document.getElementById('gameCanvas').classList.add('active');
         
         var numPlayers = 2;
         if (mode === 'online') {
