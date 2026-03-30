@@ -4,7 +4,7 @@
 
 // Initialize Supabase (uses config.js values)
 const { createClient } = supabase;
-const DB = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+const DB = createClient(CONFIG.mdxeyyokenincbbbraux.supabase.co, CONFIG.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1keGV5eW9rZW5pbmNiYmJyYXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDUzMTMsImV4cCI6MjA5MDQ4MTMxM30.wnd3jFZDPcW89whedcEeTFAw7dMqrxfIJKBI8wh9lfo);
 
 // ── Helper: get a profile row ──────────────────────────────
 async function dbGetProfile(username) {
