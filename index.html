@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Box Battles 🥊</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Three.js for 3D graphics -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- PeerJS for P2P multiplayer -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════ SCREENS ═══════════════ -->
+
+  <!-- LOADING SCREEN -->
+  <div id="screen-loading" class="screen active">
+    <div class="logo-box">📦</div>
+    <h1 class="game-title">BOX BATTLES</h1>
+    <div class="loading-bar-wrap"><div id="loading-bar" class="loading-bar"></div></div>
+    <p id="loading-text">Loading assets…</p>
+  </div>
+
+  <!-- LOGIN / REGISTER SCREEN -->
+  <div id="screen-auth" class="screen">
+    <div class="auth-card">
+      <div class="logo-box small">📦</div>
+      <h2>BOX BATTLES</h2>
+      <p class="sub">Enter your username to play</p>
+      <input id="auth-username" type="text" placeholder="Username" maxlength="16" />
+      <input id="auth-password" type="password" placeholder="Password" />
+      <div class="btn-row">
+        <button id="btn-login" class="btn primary">Login</button>
+        <button id="btn-register" class="btn secondary">Register</button>
+      </div>
+      <p id="auth-error" class="error-msg"></p>
+    </div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="screen-menu" class="screen">
+    <div class="menu-header">
+      <span class="logo-box tiny">📦</span>
+      <h1>BOX BATTLES</h1>
+    </div>
+
+    <!-- Player HUD strip -->
+    <div class="player-strip">
+      <div class="avatar-box" id="menu-avatar">🟦</div>
+      <div class="player-info">
+        <span id="menu-username">Player</span>
+        <span id="menu-xp">⭐ 0 XP &nbsp;|&nbsp; 🪙 0 Coins</span>
+      </div>
+      <button class="btn small" id="btn-shop">🛒 Shop</button>
+      <button class="btn small danger" id="btn-logout">Logout</button>
+    </div>
+
+    <!-- Nav tabs -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="play">⚔️ Play</button>
+      <button class="tab-btn" data-tab="parties">🎉 Party</button>
+      <button class="tab-btn" data-tab="alliances">🤝 Alliance</button>
+      <button class="tab-btn" data-tab="leaderboard">🏆 Ranks</button>
+      <button class="tab-btn" data-tab="profile">👤 Profile</button>
+    </div>
+
+    <!-- TAB: PLAY -->
+    <div id="tab-play" class="tab-panel active">
+      <div class="play-options">
+        <div class="play-card" id="card-quickmatch">
+          <div class="play-icon">⚡</div>
+          <h3>Quick Match</h3>
+          <p>Jump straight into battle with random players</p>
+          <button class="btn primary wide" id="btn-quickmatch">Find Match</button>
+        </div>
+        <div class="play-card" id="card-create">
+          <div class="play-icon">🏟️</div>
+          <h3>Create Lobby</h3>
+          <p>Host a private match — share code with friends</p>
+          <button class="btn secondary wide" id="btn-create-lobby">Create</button>
+        </div>
+        <div class="play-card" id="card-join">
+          <div class="play-icon">🔗</div>
+          <h3>Join by Code</h3>
+          <p>Enter a lobby code to join friends</p>
+          <input id="join-code-input" placeholder="Lobby Code" maxlength="8" />
+          <button class="btn secondary wide" id="btn-join-lobby">Join</button>
+        </div>
+      </div>
+
+      <!-- Team mode toggle -->
+      <div class="mode-strip">
+        <label class="mode-label">Mode:</label>
+        <button class="mode-btn active" data-mode="ffa">Free-for-All</button>
+        <button class="mode-btn" data-mode="2v2">2v2</button>
+        <button class="mode-btn" data-mode="3v3">3v3</button>
+      </div>
+    </div>
+
+    <!-- TAB: PARTIES -->
+    <div id="tab-parties" class="tab-panel">
+      <h3>🎉 Your Party</h3>
+      <div id="party-status" class="party-status">
+        <p id="party-none-msg">You are not in a party.</p>
+        <div id="party-members" class="member-list hidden"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-create-party">Create Party</button>
+        <button class="btn secondary" id="btn-invite-party">Invite Friend</button>
+        <button class="btn danger" id="btn-leave-party" style="display:none">Leave Party</button>
+      </div>
+      <div id="party-invite-panel" class="invite-panel hidden">
+        <input id="party-invite-name" placeholder="Friend's username" />
+        <button class="btn primary" id="btn-send-invite">Send Invite</button>
+      </div>
+      <div id="incoming-invites" class="invite-list"></div>
+    </div>
+
+    <!-- TAB: ALLIANCES -->
+    <div id="tab-alliances" class="tab-panel">
+      <h3>🤝 Alliances</h3>
+      <div id="alliance-info" class="alliance-info">
+        <p id="alliance-none-msg">You are not in an alliance.</p>
+        <div id="my-alliance" class="hidden">
+          <div class="alliance-banner" id="alliance-banner"></div>
+          <div id="alliance-members-list" class="member-list"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-create-alliance">Create Alliance</button>
+        <button class="btn secondary" id="btn-search-alliance">Search Alliances</button>
+        <button class="btn danger" id="btn-leave-alliance" style="display:none">Leave</button>
+      </div>
+      <div id="alliance-search-panel" class="search-panel hidden">
+        <input id="alliance-search-input" placeholder="Alliance name…" />
+        <button class="btn primary" id="btn-alliance-search-go">Search</button>
+        <div id="alliance-results" class="results-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB: LEADERBOARD -->
+    <div id="tab-leaderboard" class="tab-panel">
+      <h3>🏆 Global Ranks</h3>
+      <div id="leaderboard-list" class="leaderboard-list">
+        <p>Loading…</p>
+      </div>
+    </div>
+
+    <!-- TAB: PROFILE -->
+    <div id="tab-profile" class="tab-panel">
+      <div class="profile-card">
+        <div id="profile-avatar" class="avatar-big">🟦</div>
+        <h2 id="profile-name">Player</h2>
+        <div class="stat-grid">
+          <div class="stat"><span id="stat-wins">0</span><label>Wins</label></div>
+          <div class="stat"><span id="stat-losses">0</span><label>Losses</label></div>
+          <div class="stat"><span id="stat-xp">0</span><label>XP</label></div>
+          <div class="stat"><span id="stat-coins">0</span><label>Coins</label></div>
+          <div class="stat"><span id="stat-kills">0</span><label>Kills</label></div>
+          <div class="stat"><span id="stat-level">1</span><label>Level</label></div>
+        </div>
+        <h4>Choose Color</h4>
+        <div class="color-picker" id="color-picker"></div>
+      </div>
+    </div>
+
+  </div><!-- /screen-menu -->
+
+  <!-- LOBBY SCREEN -->
+  <div id="screen-lobby" class="screen">
+    <div class="lobby-top">
+      <h2>🏟️ Lobby</h2>
+      <div class="lobby-code-wrap">
+        Code: <strong id="lobby-code-display">------</strong>
+        <button class="btn small" id="btn-copy-code">📋 Copy</button>
+      </div>
+      <span id="lobby-mode-label" class="mode-badge">FFA</span>
+    </div>
+
+    <div id="lobby-players" class="lobby-players"></div>
+
+    <div class="lobby-team-panel" id="lobby-teams" style="display:none">
+      <div class="team-box" data-team="red">
+        <h4>🔴 Team Red</h4>
+        <div id="team-red-list" class="team-list"></div>
+        <button class="btn small" data-team="red" onclick="GameLobby.joinTeam('red')">Join Red</button>
+      </div>
+      <div class="team-box" data-team="blue">
+        <h4>🔵 Team Blue</h4>
+        <div id="team-blue-list" class="team-list"></div>
+        <button class="btn small" data-team="blue" onclick="GameLobby.joinTeam('blue')">Join Blue</button>
+      </div>
+    </div>
+
+    <div class="lobby-chat" id="lobby-chat">
+      <div id="lobby-chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input id="lobby-chat-input" placeholder="Chat…" maxlength="80" />
+        <button class="btn small" id="btn-lobby-chat-send">Send</button>
+      </div>
+    </div>
+
+    <div class="lobby-actions">
+      <button class="btn primary" id="btn-start-game">▶ Start Game</button>
+      <button class="btn danger" id="btn-leave-lobby">Leave</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hud-left">
+        <div id="hud-health-wrap">
+          <span>❤️</span>
+          <div class="hud-bar-bg"><div id="hud-health-bar" class="hud-bar health"></div></div>
+          <span id="hud-hp-text">100</span>
+        </div>
+        <div id="hud-shield-wrap">
+          <span>🛡️</span>
+          <div class="hud-bar-bg"><div id="hud-shield-bar" class="hud-bar shield"></div></div>
+          <span id="hud-shield-text">0</span>
+        </div>
+      </div>
+      <div id="hud-center">
+        <span id="hud-kill-feed" class="kill-feed"></span>
+      </div>
+      <div id="hud-right">
+        <div id="hud-player-list"></div>
+      </div>
+      <div id="hud-bottom">
+        <div class="ability-row">
+          <div class="ability-slot" id="slot-1" title="Punch [F]">👊 <span class="key">F</span></div>
+          <div class="ability-slot" id="slot-2" title="Shield [G]">🛡️ <span class="key">G</span></div>
+          <div class="ability-slot" id="slot-3" title="Dash [Q]">💨 <span class="key">Q</span></div>
+          <div class="ability-slot" id="slot-4" title="Special [E]">⚡ <span class="key">E</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In-game chat -->
+    <div id="game-chat">
+      <div id="game-chat-messages" class="chat-messages"></div>
+      <div class="chat-input-row" id="game-chat-input-row" style="display:none">
+        <input id="game-chat-input" placeholder="Chat…" maxlength="60" />
+        <button class="btn small" id="btn-game-chat-send">Send</button>
+      </div>
+      <small style="color:#aaa">Press T to chat</small>
+    </div>
+
+    <!-- Pause menu -->
+    <div id="pause-menu" class="pause-overlay hidden">
+      <div class="pause-card">
+        <h2>⏸ Paused</h2>
+        <button class="btn primary" id="btn-resume">Resume</button>
+        <button class="btn danger" id="btn-quit-game">Quit Match</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP SCREEN -->
+  <div id="screen-shop" class="screen">
+    <div class="shop-header">
+      <button class="btn small" id="btn-shop-back">← Back</button>
+      <h2>🛒 Shop</h2>
+      <span id="shop-coins">🪙 0</span>
+    </div>
+    <div id="shop-grid" class="shop-grid"></div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="screen">
+    <div class="results-card">
+      <h1 id="results-title">Battle Over!</h1>
+      <div id="results-list" class="results-list"></div>
+      <div class="results-rewards">
+        <span id="results-xp">+0 XP</span>
+        <span id="results-coins">+0 🪙</span>
+      </div>
+      <button class="btn primary" id="btn-results-menu">Main Menu</button>
+    </div>
+  </div>
+
+  <!-- MODAL overlay for dialogs -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="modal-title">Title</h3>
+      <p id="modal-body">Body</p>
+      <input id="modal-input" placeholder="" style="display:none" />
+      <div class="btn-row">
+        <button class="btn primary" id="modal-confirm">OK</button>
+        <button class="btn danger" id="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS MODULES (order matters) -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/social.js"></script>
+  <script src="js/lobby.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
