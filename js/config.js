@@ -6,8 +6,8 @@
 const CONFIG = {
   // ── Supabase ──────────────────────────────────────────────
   // Get these from: https://app.supabase.com → Project Settings → API
-  SUPABASE_URL:  'https://YOUR_PROJECT.supabase.co',
-  SUPABASE_ANON: 'YOUR_ANON_KEY',
+  SUPABASE_URL:  'https://mdxeyyokenincbbbraux.supabase.co',
+  SUPABASE_ANON: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1keGV5eW9rZW5pbmNiYmJyYXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MDUzMTMsImV4cCI6MjA5MDQ4MTMxM30.wnd3jFZDPcW89whedcEeTFAw7dMqrxfIJKBI8wh9lfo',
 
   // ── Game constants ────────────────────────────────────────
   MAX_PLAYERS:      6,       // max 6 per match
