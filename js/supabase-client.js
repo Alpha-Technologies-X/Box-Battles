@@ -2,9 +2,20 @@
 //  supabase-client.js  — Supabase connection + DB helpers
 // ═══════════════════════════════════════════════════════════
 
-// Initialize Supabase (uses config.js values)
-const { createClient } = supabase;
-const DB = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+// Initialize Supabase — the CDN bundle exposes createClient
+// directly on window.supabase OR as a named export depending
+// on which CDN version loads. This handles both cases safely.
+let DB;
+try {
+  // Try the UMD bundle style (most common from jsdelivr CDN)
+  const _sc = window.supabase || window.supabaseJs;
+  const createClient = _sc.createClient;
+  DB = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+  console.log('✅ Supabase connected!');
+} catch (e) {
+  console.error('❌ Supabase failed to init:', e);
+  alert('Supabase failed to load. Check your internet connection and try refreshing.');
+}
 
 // ── Helper: get a profile row ──────────────────────────────
 async function dbGetProfile(username) {
