@@ -44,7 +44,10 @@ const Auth = (() => {
     if (existing) return 'Username is already taken!';
 
     const result = await dbCreateProfile(username, password);
-    if (result.error) return 'Registration failed. Try again.';
+    if (result.error) {
+      console.error('Register DB error:', result.error);
+      return 'Registration failed: ' + (result.error.message || JSON.stringify(result.error));
+    }
 
     saveSession(result.data);
     return null; // null = success
@@ -55,7 +58,7 @@ const Auth = (() => {
     if (!username || !password) return 'Enter username and password.';
 
     const profile = await dbGetProfile(username);
-    if (!profile) return 'Username not found.';
+    if (!profile) return 'Username not found. Try registering first!';
     if (profile.password !== password) return 'Wrong password.';
 
     saveSession(profile);
