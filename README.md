@@ -116,4 +116,6 @@ with your real values.
 
 ---
 
-Made with ❤️ for **Alpha Technologies** & **JD Fun Factory** 🎮📦
+Made with ❤️ by **Alpha Technologies**
+
+**Please DO NOT Steal Code**
